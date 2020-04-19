@@ -5,10 +5,13 @@ import {
 } from 'react';
 
 import gameReducer from '../reducers/gameReducer';
-import INITIAL_STATE from '../constants/gameConstants';
+import { INITIAL_STATE } from '../constants/gameConstants';
 
 const StateContext = createContext();
 const DispatchContext = createContext();
+
+const useGameState = () => useContext(StateContext);
+const useGameDispatch = () => useContext(DispatchContext);
 
 const GameProvider = ({ children }) => {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
@@ -21,26 +24,6 @@ const GameProvider = ({ children }) => {
     </StateContext.Provider>
   );
 };
-
-const useGameState = () => {
-  const context = useContext(StateContext);
-
-  if (context === undefined) {
-    throw new Error('useGameState must be used within GameProvider');
-  }
-
-  return context;
-}
-
-const useGameDispatch = () => {
-  const context = useContext(DispatchContext);
-
-  if (context === undefined) {
-    throw new Error('useGameDispatch must be used within GameProvider');
-  }
-
-  return context;
-}
 
 export {
   GameProvider,

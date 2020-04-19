@@ -4,28 +4,29 @@ import BoardResizer from '../components/boardResizer';
 import Layout from '../components/layout';
 import Desk from '../components/desk';
 import Square from '../components/square';
-import Mine from '../components/mine';
-import Flag from '../components/flag';
 
-const Index = () => {
+const App = () => {
   const { boardSize } = useGameState();
 
   return (
+    <Layout title={`Minesweeper (active)`}>
+      <BoardResizer />
+      <Desk boardSize={boardSize}>
+        {[...Array(boardSize ** 2)].map(i => (
+          <Square key={i} />
+        ))}
+      </Desk>
+    </Layout>
+  );
+}
+
+const Index = () => {
+  return (
     <GameProvider>
-      <Layout title={`Minesweeper (active)`}>
-        <BoardResizer />
-        <Desk boardSize={boardSize}>
-          {[...Array(boardSize ** 2).keys()].map(i => (
-            <Square key={i} disabled={i === 55 || i === 10}>
-              {i === 10 && <Mine />}
-              {i === 25 && <Flag />}
-              {i === 77 ? '4' : ''}
-            </Square>
-          ))}
-        </Desk>
-      </Layout>
+      <App />
     </GameProvider>
   );
 }
+
 
 export default Index;

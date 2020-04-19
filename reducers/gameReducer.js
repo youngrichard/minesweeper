@@ -1,4 +1,4 @@
-import { gameActionTypes } from '../actions/gameActions';
+import gameActionTypes from '../actions/gameActions';
 
 const gameReducer = (state, action) => {
   switch (action.type) {
