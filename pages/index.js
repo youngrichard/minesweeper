@@ -1,16 +1,16 @@
 import { GameProvider, useGameState } from '../contexts/gameContext';
 
-import BoardResizer from '../components/boardResizer';
+import Resizer from '../components/resizer';
 import Layout from '../components/layout';
 import Desk from '../components/desk';
 import Square from '../components/square';
 
 const App = () => {
-  const { boardSize } = useGameState();
+  const { boardSize, mineCount } = useGameState();
 
   return (
     <Layout title={`Minesweeper (active)`}>
-      <BoardResizer />
+      <Resizer />
       <Desk boardSize={boardSize}>
         {[...Array(boardSize ** 2)].map(i => (
           <Square key={i} />
