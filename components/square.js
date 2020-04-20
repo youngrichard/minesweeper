@@ -1,6 +1,9 @@
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
 import GameActionTypes from '../actions/gameActions';
 
+import Flag from '../components/flag';
+import Mine from '../components/mine';
+
 const Square = ({ element, x, y }) => {
   const { isGameInProgress } = useGameState();
   const dispatch = useGameDispatch();
@@ -25,19 +28,30 @@ const Square = ({ element, x, y }) => {
       });
     }
 
-    console.log('REVEAL SQUARE');
+    if (element.isFlagged || element.isRevealed) return;
+
+    dispatch({
+      type: GameActionTypes.REVEAL_SQUARE,
+      payload: {x, y},
+    });
   }
 
   const onRightClick = e => {
     e.preventDefault();
     e.stopPropagation();
 
-    console.log('TOGGLE FLAG');
+    if (isGameInProgress && !element.isRevealed) {
+      dispatch({
+        type: GameActionTypes.TOGGLE_FLAG,
+        payload: {x, y},
+      });
+    }
   }
 
   return (
     <div style={rules()} onClick={onLeftClick} onContextMenu={onRightClick}>
-      {element.isMine ? '*' : element.adjacentMineCount}
+      {element.isFlagged && <Flag />}
+      {element.isRevealed && (element.isMine ? <Mine /> : element.adjacentMineCount)}
     </div>
   );
 }
