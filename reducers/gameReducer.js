@@ -1,6 +1,6 @@
 import GameActionTypes from '../actions/gameActions';
 import { BOARD_SIZE_MINE_COUNT_MAP } from '../constants/gameConstants';
-import { createBoard, initializeBoard } from '../utils/boardUtils';
+import { createBoard, initializeBoard, revealAllAdjacentSquares } from '../utils/boardUtils';
 
 const gameReducer = (state, action) => {
   switch (action.type) {
@@ -43,14 +43,19 @@ const gameReducer = (state, action) => {
     }
 
     case GameActionTypes.REVEAL_SQUARE: {
-      const { board } = state;
+      let { board, boardSize } = state;
       const { x, y } = action.payload;
 
       const element = board[x][y];
       element.isRevealed = true;
 
+      if (element.adjacentMineCount === 0) {
+        board = revealAllAdjacentSquares(board, boardSize, x, y);
+      }
+
       const newState = {
         ...state,
+        board,
       }
 
       if (element.isMine) {
