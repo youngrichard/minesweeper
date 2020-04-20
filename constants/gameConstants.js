@@ -17,4 +17,5 @@ export const INITIAL_STATE = {
   boardSize: INITIAL_BOARD_SIZE,
   mineCount: BOARD_SIZE_MINE_COUNT_MAP[INITIAL_BOARD_SIZE],
   isGameInProgress: false,
+  isGameLost: false,
 };

@@ -18,6 +18,7 @@ const gameReducer = (state, action) => {
         ...state,
         board: createBoard(state.boardSize),
         isGameInProgress: false,
+        isGameLost: false,
       };
     }
 
@@ -42,12 +43,35 @@ const gameReducer = (state, action) => {
     }
 
     case GameActionTypes.REVEAL_SQUARE: {
-      const {x, y} = action.payload;
-      state.board[x][y].isRevealed = true;
+      const { board } = state;
+      const { x, y } = action.payload;
+
+      const element = board[x][y];
+      element.isRevealed = true;
+
+      const newState = {
+        ...state,
+      }
+
+      if (element.isMine) {
+        newState.isGameLost = true;
+      }
+
+      return newState;
+    }
+
+    case GameActionTypes.GAME_OVER: {
+      const { board } = state;
+      board.forEach(row => {
+        row.forEach(element => {
+          if (element.isMine) element.isRevealed = true;
+        });
+      });
 
       return {
         ...state,
-        board: state.board,
+        board,
+        isGameInProgress: false,
       }
     }
 

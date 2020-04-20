@@ -4,6 +4,7 @@ const GameActionTypes = {
   REVEAL_SQUARE: 'REVEAL_SQUARE',
   RESET_BOARD: 'RESET_BOARD',
   TOGGLE_FLAG: 'TOGGLE_FLAG',
+  GAME_OVER: 'GAME_OVER',
 };
 
 export default GameActionTypes;

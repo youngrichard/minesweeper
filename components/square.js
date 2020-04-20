@@ -5,7 +5,7 @@ import Flag from '../components/flag';
 import Mine from '../components/mine';
 
 const Square = ({ element, x, y }) => {
-  const { isGameInProgress } = useGameState();
+  const { isGameInProgress, isGameLost } = useGameState();
   const dispatch = useGameDispatch();
 
   const rules = (disabled = false) => ({
@@ -21,14 +21,14 @@ const Square = ({ element, x, y }) => {
   });
 
   const onLeftClick = () => {
+    if (isGameLost || element.isFlagged || element.isRevealed) return;
+
     if (!isGameInProgress) {
       dispatch({
         type: GameActionTypes.INITIALIZE_BOARD,
         payload: {x, y},
       });
     }
-
-    if (element.isFlagged || element.isRevealed) return;
 
     dispatch({
       type: GameActionTypes.REVEAL_SQUARE,
