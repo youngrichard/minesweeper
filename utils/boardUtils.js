@@ -1,8 +1,24 @@
 import { getRandomIntExcludingNum } from './numberUtils';
 
 export function createBoard(boardSize) {
-  const generateRow = () => Array(boardSize).fill(0);
-  return Array(boardSize).fill().map(generateRow);
+  const board = [];
+
+  for (let i = 0; i < boardSize; i++) {
+    const row = [];
+
+    for (let j = 0; j < boardSize; j++) {
+      row.push({
+        isMine: false,
+        isFlagged: false,
+        isRevealed: false,
+        adjacentMineCount: 0,
+      });
+    }
+
+    board.push(row);
+  }
+
+  return board;
 }
 
 export function initializeBoard(board, boardSize, mineCount, origin) {
@@ -15,9 +31,10 @@ function addMines(board, boardSize, mineCount, origin) {
   while (mineCount) {
     const x = getRandomIntExcludingNum(boardSize, origin.x);
     const y = getRandomIntExcludingNum(boardSize, origin.y);
+    const element = board[x][y];
 
-    if (board[x][y] !== '*') {
-      board[x][y] = '*';
+    if (!element.isMine) {
+      element.isMine = true;
       mineCount--;
     }
   }
@@ -28,7 +45,7 @@ function addMines(board, boardSize, mineCount, origin) {
 function addCounts(board) {
   for (let x = 0; x < board.length; x++) {
     for (let y = 0; y < board[x].length; y++) {
-      if (board[x][y] === '*') {
+      if (board[x][y].isMine) {
         countNeighbors(board, x, y);
       }
     }
@@ -47,8 +64,8 @@ function countNeighbors(board, x, y) {
       if (isInBounds(row, col, max)) {
         const element = board[row][col];
 
-        if (isNotMine(element)) {
-          board[row][col]++;
+        if (!element.isMine) {
+          board[row][col].adjacentMineCount++;
         }
       }
     }
@@ -59,8 +76,4 @@ function isInBounds(row, col, max) {
   if (row < 0 || col < 0) return false;
   if (row > max || col > max) return false;
   return true;
-}
-
-function isNotMine(element) {
-  return element !== '*';
 }

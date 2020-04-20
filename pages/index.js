@@ -15,10 +15,10 @@ const App = () => {
       <RestartButton />
       <Desk boardSize={boardSize}>
         {board.map((row, x) =>
-          row.map((value, y) =>
+          row.map((element, y) =>
             <Square
               key={x + y}
-              value={value}
+              element={element}
               x={x}
               y={y}
             />

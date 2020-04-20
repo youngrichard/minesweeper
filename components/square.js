@@ -1,7 +1,7 @@
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
 import GameActionTypes from '../actions/gameActions';
 
-const Square = ({ value, x, y }) => {
+const Square = ({ element, x, y }) => {
   const { isGameInProgress } = useGameState();
   const dispatch = useGameDispatch();
 
@@ -36,7 +36,9 @@ const Square = ({ value, x, y }) => {
   }
 
   return (
-    <div style={rules()} onClick={onLeftClick} onContextMenu={onRightClick}>{value}</div>
+    <div style={rules()} onClick={onLeftClick} onContextMenu={onRightClick}>
+      {element.isMine ? '*' : element.adjacentMineCount}
+    </div>
   );
 }
 
