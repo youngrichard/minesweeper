@@ -1,20 +1,20 @@
-import { getRandomInteger } from './numberUtils';
+import { getRandomIntExcludingNum } from './numberUtils';
 
 export function createBoard(boardSize) {
   const generateRow = () => Array(boardSize).fill(0);
   return Array(boardSize).fill().map(generateRow);
 }
 
-export function initializeBoard(board, boardSize, mineCount) {
-  const boardWithMines = addMines(board, boardSize, mineCount);
+export function initializeBoard(board, boardSize, mineCount, origin) {
+  const boardWithMines = addMines(board, boardSize, mineCount, origin);
   const boardWithCounts = addCounts(boardWithMines);
   return boardWithCounts;
 };
 
-function addMines(board, boardSize, mineCount) {
+function addMines(board, boardSize, mineCount, origin) {
   while (mineCount) {
-    const x = getRandomInteger(boardSize);
-    const y = getRandomInteger(boardSize);
+    const x = getRandomIntExcludingNum(boardSize, origin.x);
+    const y = getRandomIntExcludingNum(boardSize, origin.y);
 
     if (board[x][y] !== '*') {
       board[x][y] = '*';

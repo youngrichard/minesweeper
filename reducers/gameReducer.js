@@ -9,18 +9,22 @@ const gameReducer = (state, action) => {
         ...state,
         boardSize: action.payload,
         mineCount: BOARD_SIZE_MINE_COUNT_MAP[action.payload],
+        isGameInProgress: false,
       };
 
     case GameActionTypes.RESET_BOARD:
       return {
         ...state,
         board: createBoard(state.boardSize),
+        isGameInProgress: false,
       };
 
     case GameActionTypes.INITIALIZE_BOARD:
+      const origin = action.payload;
+
       return {
         ...state,
-        board: initializeBoard(state.board, state.boardSize, state.mineCount),
+        board: initializeBoard(state.board, state.boardSize, state.mineCount, origin),
         isGameInProgress: true,
       };
 
