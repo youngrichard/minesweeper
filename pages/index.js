@@ -8,11 +8,11 @@ import {
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
 
-import BoardSizer from '../components/boardSizer';
 import RestartButton from '../components/restartButton';
+import BoardSizer from '../components/boardSizer';
 import Layout from '../components/layout';
-import Desk from '../components/desk';
 import Square from '../components/square';
+import Desk from '../components/desk';
 
 const App = () => {
   const {
@@ -26,21 +26,16 @@ const App = () => {
     if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST) {
       dispatch({ type: GameActionTypes.GAME_OVER });
     }
-  }, [gameStatus])
+  }, [gameStatus]);
 
   return (
-    <Layout title={`Minesweeper (active)`}>
+    <Layout title="Minesweeper">
       <BoardSizer />
       <RestartButton />
       <Desk boardSize={boardSize}>
         {board.map((row, x) =>
-          row.map((element, y) =>
-            <Square
-              key={x + y}
-              element={element}
-              x={x}
-              y={y}
-            />
+          row.map((square, y) =>
+            <Square key={x + ',' + y} square={square} />
           )
         )}
       </Desk>
@@ -49,6 +44,7 @@ const App = () => {
 }
 
 const Index = () => {
+  // This allows us to wrap our App within the GameProvider
   return (
     <GameProvider>
       <App />

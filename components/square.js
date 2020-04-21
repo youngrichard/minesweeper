@@ -1,11 +1,11 @@
-import { useGameState, useGameDispatch } from '../contexts/gameContext';
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
+import { useGameState, useGameDispatch } from '../contexts/gameContext';
 
 import Flag from '../components/flag';
 import Mine from '../components/mine';
 
-const Square = ({ element, x, y }) => {
+const Square = ({ square }) => {
   const { gameStatus } = useGameState();
   const dispatch = useGameDispatch();
 
@@ -22,18 +22,18 @@ const Square = ({ element, x, y }) => {
   });
 
   const onLeftClick = () => {
-    if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST || element.isFlagged || element.isRevealed) return;
+    if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST || square.isFlagged || square.isRevealed) return;
 
     if (gameStatus === GameStatusTypes.INACTIVE) {
       dispatch({
         type: GameActionTypes.INITIALIZE_BOARD,
-        payload: {x, y},
+        payload: square,
       });
     }
 
     dispatch({
       type: GameActionTypes.REVEAL_SQUARE,
-      payload: {x, y},
+      payload: square,
     });
   }
 
@@ -41,18 +41,18 @@ const Square = ({ element, x, y }) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (gameStatus === GameStatusTypes.ACTIVE && !element.isRevealed) {
+    if (gameStatus === GameStatusTypes.ACTIVE && !square.isRevealed) {
       dispatch({
         type: GameActionTypes.TOGGLE_FLAG,
-        payload: {x, y},
+        payload: square,
       });
     }
   }
 
   return (
     <div style={rules()} onClick={onLeftClick} onContextMenu={onRightClick}>
-      {element.isFlagged && <Flag />}
-      {element.isRevealed && (element.isMine ? <Mine /> : element.adjacentMineCount)}
+      {square.isFlagged && <Flag />}
+      {square.isRevealed && (square.isMine ? <Mine /> : square.numNeighboringMines)}
     </div>
   );
 }

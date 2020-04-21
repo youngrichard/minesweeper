@@ -1,76 +1,84 @@
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
 import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
-import { createBoard, initializeBoard, revealAllAdjacentSquares, checkActiveGameStatus } from '../utils/boardUtils';
+
+import {
+  checkActiveGameStatus,
+  createBoard,
+  initializeBoard,
+  revealAllSquares,
+  revealSquare,
+  toggleFlag,
+} from '../utils/gameUtils';
 
 const gameReducer = (state, action) => {
   switch (action.type) {
     case GameActionTypes.CHANGE_BOARD_SIZE: {
+      const boardSize = action.payload;
+
       return {
         ...state,
-        boardSize: action.payload,
-        numMines: BOARD_SIZE_NUM_MINES_MAP[action.payload],
+        boardSize,
+        numMines: BOARD_SIZE_NUM_MINES_MAP[boardSize],
         gameStatus: GameStatusTypes.INACTIVE,
       };
     }
 
     case GameActionTypes.RESET_BOARD: {
+      const { boardSize } = state;
+
       return {
         ...state,
-        board: createBoard(state.boardSize),
+        board: createBoard(boardSize),
         gameStatus: GameStatusTypes.INACTIVE,
       };
     }
 
     case GameActionTypes.INITIALIZE_BOARD: {
-      const origin = action.payload;
+      const clickedSquare = action.payload;
+      const {
+        board,
+        boardSize,
+        numMines,
+      } = state;
 
       return {
         ...state,
-        board: initializeBoard(state.board, state.boardSize, state.numMines, origin),
+        board: initializeBoard(board, boardSize, numMines, clickedSquare),
         gameStatus: GameStatusTypes.ACTIVE,
       };
     }
 
     case GameActionTypes.TOGGLE_FLAG: {
-      const {x, y} = action.payload;
-      state.board[x][y].isFlagged = !state.board[x][y].isFlagged;
+      const { board } = state;
+      const clickedSquare = action.payload;
 
       return {
         ...state,
-        board: state.board,
+        board: toggleFlag(board, clickedSquare),
       }
     }
 
     case GameActionTypes.REVEAL_SQUARE: {
-      let { board, boardSize } = state;
-      const { x, y } = action.payload;
+      const { board, boardSize } = state;
+      const clickedSquare = action.payload;
 
-      const element = board[x][y];
-      element.isRevealed = true;
-
-      if (element.adjacentMineCount === 0) {
-        board = revealAllAdjacentSquares(board, boardSize, x, y);
-      }
+      const newBoard = revealSquare(board, boardSize, clickedSquare);
+      const gameStatus = checkActiveGameStatus(newBoard, boardSize)
 
       return {
         ...state,
-        board,
-        gameStatus: checkActiveGameStatus(board, boardSize),
+        board: newBoard,
+        gameStatus,
       };
     }
 
     case GameActionTypes.GAME_OVER: {
       const { board } = state;
-      board.forEach(row => {
-        row.forEach(element => {
-          if (element.isMine) element.isRevealed = true;
-        });
-      });
 
       return {
         ...state,
-        board,
+        board: revealAllSquares(board),
       }
     }
 

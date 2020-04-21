@@ -1,6 +1,5 @@
 import GameActionTypes from '../actions/gameActions';
-
-import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
+import { getBoardSizes } from '../constants/gameConstants';
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
 
 const BoardSizer = () => {
@@ -13,14 +12,12 @@ const BoardSizer = () => {
       payload: Number(event.target.value),
     });
 
-    dispatch({
-      type: GameActionTypes.RESET_BOARD,
-    })
+    dispatch({ type: GameActionTypes.RESET_BOARD });
   }
 
   return (
     <select value={boardSize} onChange={onChangeHandler}>
-      {Object.keys(BOARD_SIZE_NUM_MINES_MAP).map((size, i) => <option key={i} value={size}>{size}</option>)}
+      {getBoardSizes().map((size, i) => <option key={i} value={size}>{size}</option>)}
     </select>
   );
 };

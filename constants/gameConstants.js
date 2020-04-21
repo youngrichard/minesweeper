@@ -1,4 +1,4 @@
-import { createBoard } from '../utils/boardUtils';
+import { createBoard } from '../utils/gameUtils';
 
 const DEFAULT_BOARD_SIZE = 10;
 
@@ -11,6 +11,8 @@ export const BOARD_SIZE_NUM_MINES_MAP = {
   16: 40,
   22: 99,
 };
+
+export const getBoardSizes = () => Object.keys(BOARD_SIZE_NUM_MINES_MAP);
 
 export const GameStatusTypes = {
   ACTIVE: 'ACTIVE',
