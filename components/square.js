@@ -1,11 +1,12 @@
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
 import GameActionTypes from '../actions/gameActions';
+import { GameStatusTypes } from '../constants/gameConstants';
 
 import Flag from '../components/flag';
 import Mine from '../components/mine';
 
 const Square = ({ element, x, y }) => {
-  const { isGameInProgress, isGameLost } = useGameState();
+  const { gameStatus } = useGameState();
   const dispatch = useGameDispatch();
 
   const rules = (disabled = false) => ({
@@ -21,9 +22,9 @@ const Square = ({ element, x, y }) => {
   });
 
   const onLeftClick = () => {
-    if (isGameLost || element.isFlagged || element.isRevealed) return;
+    if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST || element.isFlagged || element.isRevealed) return;
 
-    if (!isGameInProgress) {
+    if (gameStatus === GameStatusTypes.INACTIVE) {
       dispatch({
         type: GameActionTypes.INITIALIZE_BOARD,
         payload: {x, y},
@@ -40,7 +41,7 @@ const Square = ({ element, x, y }) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isGameInProgress && !element.isRevealed) {
+    if (gameStatus === GameStatusTypes.ACTIVE && !element.isRevealed) {
       dispatch({
         type: GameActionTypes.TOGGLE_FLAG,
         payload: {x, y},

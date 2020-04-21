@@ -1,5 +1,6 @@
 import GameActionTypes from '../actions/gameActions';
-import { BOARD_SIZE_MINE_COUNT_MAP } from '../constants/gameConstants';
+import { GameStatusTypes } from '../constants/gameConstants';
+import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
 import { createBoard, initializeBoard, revealAllAdjacentSquares } from '../utils/boardUtils';
 
 const gameReducer = (state, action) => {
@@ -8,8 +9,8 @@ const gameReducer = (state, action) => {
       return {
         ...state,
         boardSize: action.payload,
-        mineCount: BOARD_SIZE_MINE_COUNT_MAP[action.payload],
-        isGameInProgress: false,
+        numMines: BOARD_SIZE_NUM_MINES_MAP[action.payload],
+        gameStatus: GameStatusTypes.INACTIVE,
       };
     }
 
@@ -17,8 +18,7 @@ const gameReducer = (state, action) => {
       return {
         ...state,
         board: createBoard(state.boardSize),
-        isGameInProgress: false,
-        isGameLost: false,
+        gameStatus: GameStatusTypes.INACTIVE,
       };
     }
 
@@ -27,8 +27,8 @@ const gameReducer = (state, action) => {
 
       return {
         ...state,
-        board: initializeBoard(state.board, state.boardSize, state.mineCount, origin),
-        isGameInProgress: true,
+        board: initializeBoard(state.board, state.boardSize, state.numMines, origin),
+        gameStatus: GameStatusTypes.ACTIVE,
       };
     }
 
@@ -59,7 +59,7 @@ const gameReducer = (state, action) => {
       }
 
       if (element.isMine) {
-        newState.isGameLost = true;
+        newState.gameStatus = GameStatusTypes.LOST;
       }
 
       return newState;
@@ -76,7 +76,6 @@ const gameReducer = (state, action) => {
       return {
         ...state,
         board,
-        isGameInProgress: false,
       }
     }
 

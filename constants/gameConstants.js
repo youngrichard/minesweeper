@@ -1,6 +1,8 @@
 import { createBoard } from '../utils/boardUtils';
 
-export const BOARD_SIZE_MINE_COUNT_MAP = {
+const DEFAULT_BOARD_SIZE = 10;
+
+export const BOARD_SIZE_NUM_MINES_MAP = {
   8: 10,
   9: 10,
   10: 10,
@@ -10,12 +12,16 @@ export const BOARD_SIZE_MINE_COUNT_MAP = {
   22: 99,
 };
 
-const INITIAL_BOARD_SIZE = 10;
+export const GameStatusTypes = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+  LOST: 'LOST',
+  WON: 'WON',
+};
 
 export const INITIAL_STATE = {
-  board: createBoard(INITIAL_BOARD_SIZE),
-  boardSize: INITIAL_BOARD_SIZE,
-  mineCount: BOARD_SIZE_MINE_COUNT_MAP[INITIAL_BOARD_SIZE],
-  isGameInProgress: false,
-  isGameLost: false,
+  board: createBoard(DEFAULT_BOARD_SIZE),
+  boardSize: DEFAULT_BOARD_SIZE,
+  numMines: BOARD_SIZE_NUM_MINES_MAP[DEFAULT_BOARD_SIZE],
+  gameStatus: GameStatusTypes.INACTIVE,
 };

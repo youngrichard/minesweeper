@@ -23,21 +23,21 @@ export function createBoard(boardSize) {
   return board;
 }
 
-export function initializeBoard(board, boardSize, mineCount, origin) {
-  const boardWithMines = addMines(board, boardSize, mineCount, origin);
+export function initializeBoard(board, boardSize, numMines, origin) {
+  const boardWithMines = addMines(board, boardSize, numMines, origin);
   const boardWithCounts = addCounts(boardWithMines);
   return boardWithCounts;
 };
 
-function addMines(board, boardSize, mineCount, origin) {
-  while (mineCount) {
+function addMines(board, boardSize, numMines, origin) {
+  while (numMines) {
     const x = getRandomIntExcludingNum(boardSize, origin.x);
     const y = getRandomIntExcludingNum(boardSize, origin.y);
     const element = board[x][y];
 
     if (!element.isMine) {
       element.isMine = true;
-      mineCount--;
+      numMines--;
     }
   }
 

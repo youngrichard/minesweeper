@@ -6,6 +6,7 @@ import {
   useGameDispatch,
 } from '../contexts/gameContext';
 import GameActionTypes from '../actions/gameActions';
+import { GameStatusTypes } from '../constants/gameConstants';
 
 import BoardSizer from '../components/boardSizer';
 import RestartButton from '../components/restartButton';
@@ -17,13 +18,15 @@ const App = () => {
   const {
     board,
     boardSize,
-    isGameLost,
+    gameStatus,
   } = useGameState();
   const dispatch = useGameDispatch();
 
   useEffect(() => {
-    if (isGameLost) dispatch({ type: GameActionTypes.GAME_OVER });
-  }, [isGameLost])
+    if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST) {
+      dispatch({ type: GameActionTypes.GAME_OVER });
+    }
+  }, [gameStatus])
 
   return (
     <Layout title={`Minesweeper (active)`}>
