@@ -1,7 +1,7 @@
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
 import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
-import { createBoard, initializeBoard, revealAllAdjacentSquares } from '../utils/boardUtils';
+import { createBoard, initializeBoard, revealAllAdjacentSquares, checkActiveGameStatus } from '../utils/boardUtils';
 
 const gameReducer = (state, action) => {
   switch (action.type) {
@@ -53,16 +53,11 @@ const gameReducer = (state, action) => {
         board = revealAllAdjacentSquares(board, boardSize, x, y);
       }
 
-      const newState = {
+      return {
         ...state,
         board,
-      }
-
-      if (element.isMine) {
-        newState.gameStatus = GameStatusTypes.LOST;
-      }
-
-      return newState;
+        gameStatus: checkActiveGameStatus(board, boardSize),
+      };
     }
 
     case GameActionTypes.GAME_OVER: {

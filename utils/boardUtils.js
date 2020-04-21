@@ -1,4 +1,6 @@
 import { getRandomIntExcludingNum } from './numberUtils';
+import { GameStatusTypes } from '../constants/gameConstants';
+import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
 
 export function createBoard(boardSize) {
   const board = [];
@@ -141,4 +143,20 @@ function isInBounds(row, col, boardSize) {
   if (row < 0 || col < 0) return false;
   if (row > boardSize - 1 || col > boardSize - 1) return false;
   return true;
+}
+
+export function checkActiveGameStatus(board, boardSize) {
+  const expectedRevealed = boardSize ** 2 - BOARD_SIZE_NUM_MINES_MAP[boardSize];
+  let actualRevealed = 0;
+
+  for (let row of board) {
+    for (let square of row) {
+      if (square.isMine && square.isRevealed) return GameStatusTypes.LOST;
+      if (!square.isMine && square.isRevealed) actualRevealed++;
+    }
+  }
+
+  if (actualRevealed === expectedRevealed) return GameStatusTypes.WON;
+
+  return GameStatusTypes.ACTIVE;
 }
