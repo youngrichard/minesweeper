@@ -29,7 +29,7 @@ const App = () => {
   }, [gameStatus]);
 
   return (
-    <Layout title="Minesweeper">
+    <Layout>
       <BoardSizer />
       <RestartButton />
       <Desk boardSize={boardSize}>

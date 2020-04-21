@@ -1,6 +1,9 @@
+import { useState } from 'react';
+
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
+import { colorPalette } from '../utils/colorUtils';
 
 import Flag from '../components/flag';
 import Mine from '../components/mine';
@@ -9,16 +12,24 @@ const Square = ({ square }) => {
   const { gameStatus } = useGameState();
   const dispatch = useGameDispatch();
 
-  const rules = (disabled = false) => ({
+  const [isHover, setIsHover] = useState(false);
+
+  const rules = (disabled, isHover, value) => ({
     width: 40,
     height: 40,
     padding: 10,
-    cursor: disabled ? 'initial' : 'pointer',
-    backgroundColor: disabled ? '#CCC' : '#FFF',
-    border: `1px solid black`,
+
+    fontSize: 20,
     lineHeight: 1,
     textAlign: 'center',
-    fontSize: 18
+
+    backgroundColor: disabled ? '#EEE' : (isHover ? '#A9A9A9' : '#C4C4C4'),
+    borderColor: (isHover && !disabled) ? '#A9A9A9 #808080 #808080 #A9A9A9' : '#F2F2F2 #808080 #808080 #F2F2F2',
+    borderStyle: 'solid',
+    borderWidth: '4px',
+
+    color: colorPalette[value],
+    cursor: disabled ? 'initial' : 'pointer',
   });
 
   const onLeftClick = () => {
@@ -49,10 +60,31 @@ const Square = ({ square }) => {
     }
   }
 
+  const renderContent = square => {
+    if (square.isFlagged) return <Flag />;
+
+    if (square.isRevealed) {
+      if (square.isMine) return <Mine />;
+      if (square.numNeighboringMines !== 0) return square.numNeighboringMines;
+    }
+  }
+
+  const isDisabled = square => {
+    if (square.isMine || square.isFlagged) return false;
+    return square.isRevealed;
+  }
+
   return (
-    <div style={rules()} onClick={onLeftClick} onContextMenu={onRightClick}>
-      {square.isFlagged && <Flag />}
-      {square.isRevealed && (square.isMine ? <Mine /> : square.numNeighboringMines)}
+    <div
+      style={rules(isDisabled(square), isHover, square.numNeighboringMines)}
+      onClick={onLeftClick}
+      onContextMenu={onRightClick}
+      onMouseEnter={() => {
+        if (square.isFlagged || (square.isMine && square.isRevealed)) return;
+        setIsHover(true);
+      }}
+      onMouseLeave={() => setIsHover(false)}>
+      {renderContent(square)}
     </div>
   );
 }

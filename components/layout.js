@@ -5,7 +5,9 @@ import { createComponent } from 'cf-style-container';
 
 const Center = createComponent(({ theme }) => ({
   margin: '0px auto',
-  margin: theme.space[4]
+  margin: theme.space[4],
+  letterSpacing: '4px',
+  textAlign: 'center',
 }));
 
 export default ({ children, title = 'Minesweeper' }) => (

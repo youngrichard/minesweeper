@@ -19,13 +19,13 @@ export default class MyDocument extends Document {
               __html: `
                 *{ box-sizing: border-box; }
                 body { margin: 0; }
-                html { font-family: 'Open Sans', sans-serif; }
+                html { font-family: 'Roboto Mono', sans-serif; }
                `
             }}
           />
           {getStyles(this.props)}
           <link
-            href="https://fonts.googleapis.com/css?family=Open+Sans"
+            href="https://fonts.googleapis.com/css?family=Roboto+Mono"
             rel="stylesheet"
           />
         </Head>
