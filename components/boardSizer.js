@@ -2,6 +2,10 @@ import GameActionTypes from '../actions/gameActions';
 import { getBoardSizes } from '../constants/gameConstants';
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
 
+/**
+ * Changes board size
+ */
+
 const BoardSizer = () => {
   const { boardSize } = useGameState();
   const dispatch = useGameDispatch();

@@ -64,6 +64,8 @@ const gameReducer = (state, action) => {
       const clickedSquare = action.payload;
 
       const newBoard = revealSquare(board, boardSize, clickedSquare);
+
+      // Update game status based upon new board
       const gameStatus = checkActiveGameStatus(newBoard, boardSize)
 
       return {
