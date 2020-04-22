@@ -5,10 +5,10 @@ import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
 import {
   checkActiveGameStatus,
   countFlags,
-  createBoard,
-  initializeBoard,
-  revealAllSquares,
-  revealSquare,
+  createBlankBoard,
+  populateBoard,
+  revealAllFields,
+  revealField,
   toggleFlag,
 } from '../utils/gameUtils';
 
@@ -19,8 +19,8 @@ const gameReducer = (state, action) => {
 
       return {
         ...state,
-        board: createBoard(boardSize),
         boardSize,
+        board: createBlankBoard(boardSize),
         numMines: BOARD_SIZE_NUM_MINES_MAP[boardSize],
         gameStatus: GameStatusTypes.INACTIVE,
       };
@@ -31,21 +31,21 @@ const gameReducer = (state, action) => {
 
       return {
         ...state,
-        board: createBoard(boardSize),
+        board: createBlankBoard(boardSize),
         gameStatus: GameStatusTypes.INACTIVE,
       };
     }
 
-    case GameActionTypes.INITIALIZE_BOARD: {
-      const clickedSquare = action.payload;
+    case GameActionTypes.POPULATE_BOARD: {
+      const coordinates = action.payload;
       const {
         board,
         boardSize,
         numMines,
       } = state;
 
-      const initBoard = initializeBoard(board, boardSize, numMines, clickedSquare);
-      const newBoard = revealSquare(initBoard, boardSize, clickedSquare);
+      const tempBoard = populateBoard(board, boardSize, numMines, coordinates);
+      const newBoard = revealField(tempBoard, boardSize, coordinates);
 
       return {
         ...state,
@@ -57,9 +57,9 @@ const gameReducer = (state, action) => {
 
     case GameActionTypes.TOGGLE_FLAG: {
       const { board } = state;
-      const clickedSquare = action.payload;
+      const coordinates = action.payload;
 
-      const newBoard = toggleFlag(board, clickedSquare);
+      const newBoard = toggleFlag(board, coordinates);
       const numFlags = countFlags(newBoard);
 
       return {
@@ -69,11 +69,11 @@ const gameReducer = (state, action) => {
       };
     }
 
-    case GameActionTypes.REVEAL_SQUARE: {
+    case GameActionTypes.REVEAL_FIELD: {
       const { board, boardSize } = state;
-      const clickedSquare = action.payload;
+      const coordinates = action.payload;
 
-      const newBoard = revealSquare(board, boardSize, clickedSquare);
+      const newBoard = revealField(board, boardSize, coordinates);
       const gameStatus = checkActiveGameStatus(newBoard, boardSize)
 
       return {
@@ -88,7 +88,7 @@ const gameReducer = (state, action) => {
 
       return {
         ...state,
-        board: revealAllSquares(board),
+        board: revealAllFields(board),
       };
     }
 

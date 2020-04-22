@@ -11,8 +11,6 @@ const RestartButton = () => {
   const dispatch = useGameDispatch();
   const [isPressed, setIsPressed] = useState(false);
 
-  const onClickHandler = () => dispatch({ type: GameActionTypes.RESET_BOARD });
-
   const rules = (isPressed) =>({
     boxShadow: isPressed
       ? '#868A8E 0px 0px 0px 1px inset, #000 0px 0px 0px 1px'
@@ -25,6 +23,8 @@ const RestartButton = () => {
     borderStyle: 'none',
     fontSize: '12px',
   });
+
+  const onClickHandler = () => dispatch({ type: GameActionTypes.RESET_BOARD });
 
   return (
     <button

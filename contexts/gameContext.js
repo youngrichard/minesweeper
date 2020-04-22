@@ -15,7 +15,7 @@ const DispatchContext = createContext();
 const useGameState = () => useContext(StateContext);
 const useGameDispatch = () => useContext(DispatchContext);
 
-// Provides contexts children
+// Provides contexts to children
 const GameProvider = ({ children }) => {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
 

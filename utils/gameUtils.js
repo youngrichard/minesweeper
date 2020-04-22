@@ -8,11 +8,11 @@ import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
  * Helper functions to manipulate the game board
  */
 
-export function createBoard(boardSize) {
-  // Creates an empty board of a given size
-  // x and y coordinates are added to each square
+export function createBlankBoard(boardSize) {
+  // Creates an blank board of a given size
+  // x and y coordinates are added to each field
   const board = [];
-  const DEFAULT_SQUARE_PROPS = {
+  const DEFAULT_FIELD_PROPS = {
     isMine: false,
     isFlagged: false,
     isRevealed: false,
@@ -24,7 +24,7 @@ export function createBoard(boardSize) {
 
     for (let y = 0; y < boardSize; y++) {
       row.push({
-        ...DEFAULT_SQUARE_PROPS,
+        ...DEFAULT_FIELD_PROPS,
         x,
         y,
       });
@@ -36,25 +36,25 @@ export function createBoard(boardSize) {
   return board;
 }
 
-export function initializeBoard(board, boardSize, numMines, clickedSquare) {
+export function populateBoard(board, boardSize, numMines, coordinates) {
   // Populates mines and counts on the board
   const newBoard = cloneDeep(board);
-  const mineField = plantMines(newBoard, boardSize, numMines, clickedSquare);
+  const mineField = plantMines(newBoard, boardSize, numMines, coordinates);
   return countNeighboringMines(mineField, boardSize);
 };
 
-function plantMines(board, boardSize, numMines, clickedSquare) {
-  // Plant mines at random locations excluding the clicked square
+function plantMines(board, boardSize, numMines, coordinates) {
+  // Plant mines at random locations excluding the click origin
   const newBoard = cloneDeep(board);
 
   while (numMines > 0) {
-    const x = getRandomInt(0, boardSize, clickedSquare.x);
-    const y = getRandomInt(0, boardSize, clickedSquare.y);
-    const square = newBoard[x][y];
+    const x = getRandomInt(0, boardSize, coordinates.x);
+    const y = getRandomInt(0, boardSize, coordinates.y);
+    const field = newBoard[x][y];
 
-    if (!square.isMine) {
-      square.isMine = true;
-      numMines -= 1;
+    if (!field.isMine) {
+      field.isMine = true;
+      numMines--;
     }
   }
 
@@ -62,15 +62,15 @@ function plantMines(board, boardSize, numMines, clickedSquare) {
 }
 
 function countNeighboringMines(board, boardSize) {
-  // Counts neighboring mines for each square
+  // Counts neighboring mines for each field
   const newBoard = cloneDeep(board);
 
   for (let row of newBoard) {
-    for (let square of row) {
-      if (square.isMine) {
-        const neighbors = getNeighboringSquares(newBoard, boardSize, square);
+    for (let field of row) {
+      if (field.isMine) {
+        const neighbors = getNeighboringFields(newBoard, boardSize, field);
         neighbors.forEach(n => {
-          n.numNeighboringMines += 1;
+          n.numNeighboringMines++;
         });
       }
     }
@@ -79,29 +79,29 @@ function countNeighboringMines(board, boardSize) {
   return newBoard;
 }
 
-function getNeighboringSquares(board, boardSize, originSquare) {
-  // Returns neighboring squares
-  // Excludes origin square and out-of-bounds squares
-  const neighboringSquares = [];
+function getNeighboringFields(board, boardSize, originField) {
+  // Returns neighboring fields
+  // Excludes origin field and out-of-bounds fields
+  const neighboringFields = [];
   const xIndexes = [
-    originSquare.x - 1,
-    originSquare.x,
-    originSquare.x + 1,
+    originField.x - 1,
+    originField.x,
+    originField.x + 1,
   ];
   const yIndexes = [
-    originSquare.y - 1,
-    originSquare.y,
-    originSquare.y + 1,
+    originField.y - 1,
+    originField.y,
+    originField.y + 1,
   ];
 
   for (let x of xIndexes) {
     for (let y of yIndexes) {
-      if (x === originSquare.x && y === originSquare.y) continue;
-      if (isInBounds(x, y, boardSize - 1)) neighboringSquares.push(board[x][y]);
+      if (x === originField.x && y === originField.y) continue;
+      if (isInBounds(x, y, boardSize - 1)) neighboringFields.push(board[x][y]);
     }
   }
 
-  return neighboringSquares;
+  return neighboringFields;
 }
 
 function isInBounds(x, y, max) {
@@ -111,16 +111,16 @@ function isInBounds(x, y, max) {
   return true;
 }
 
-export function revealNeighbors(board, boardSize, originSquare) {
-  // Recursively reveals neighbors of squares with no adjacent mines
+export function revealNeighbors(board, boardSize, originField) {
+  // Recursively reveals neighbors of fields with no adjacent mines
   const newBoard = cloneDeep(board);
   const neighbors = [];
   const memo = {};
 
-  function recurse(square) {
-    const neighboringSquares = getNeighboringSquares(newBoard, boardSize, square);
+  function recurse(field) {
+    const neighboringFields = getNeighboringFields(newBoard, boardSize, field);
 
-    for (let n of neighboringSquares) {
+    for (let n of neighboringFields) {
       const coordinates = `${n.x},${n.y}`;
 
       if (memo[coordinates]) continue;
@@ -132,7 +132,7 @@ export function revealNeighbors(board, boardSize, originSquare) {
     }
   }
 
-  recurse(originSquare);
+  recurse(originField);
 
   neighbors.forEach(neighbor => {
     neighbor.isRevealed = true;
@@ -145,51 +145,51 @@ export function checkActiveGameStatus(board, boardSize) {
   const flatBoard = flattenDeep(cloneDeep(board));
 
   // If a mine is revealed, the game is lost
-  for (let square of flatBoard) {
-    if (square.isMine && square.isRevealed) return GameStatusTypes.LOST;
+  for (let field of flatBoard) {
+    if (field.isMine && field.isRevealed) return GameStatusTypes.LOST;
   }
 
   const expected = boardSize ** 2 - BOARD_SIZE_NUM_MINES_MAP[boardSize];
   const actual = flatBoard.reduce((total, current) => current.isRevealed ? total + 1 : total, 0);
 
-  // If number of revealed = number of squares - number of mines, the game is won
+  // If number of revealed = area - number of mines, the game is won
   if (actual === expected) return GameStatusTypes.WON;
 
   // Else, the game is still active
   return GameStatusTypes.ACTIVE;
 }
 
-export function toggleFlag(board, clickedSquare) {
-  // Toggle flag for clicked square
-
+export function toggleFlag(board, coordinates) {
   const newBoard = cloneDeep(board);
-  newBoard[clickedSquare.x][clickedSquare.y].isFlagged = !clickedSquare.isFlagged;
+
+  // Toggle flag for clicked field
+  newBoard[coordinates.x][coordinates.y].isFlagged = !field.isFlagged;
 
   return newBoard;
 }
 
-export function revealSquare(board, boardSize, clickedSquare) {
+export function revealField(board, boardSize, coordinates) {
   const newBoard = cloneDeep(board);
 
-  // Reveal clicked square
-  newBoard[clickedSquare.x][clickedSquare.y].isRevealed = true;
-  const updatedClickedSquare = newBoard[clickedSquare.x][clickedSquare.y];
+  // Reveal clicked field
+  newBoard[coordinates.x][coordinates.y].isRevealed = true;
+  const updatedField = newBoard[coordinates.x][coordinates.y];
 
-  if (updatedClickedSquare.numNeighboringMines === 0) {
-    // If clicked square does not have adjacent mines, reveal neighbors
-    return revealNeighbors(newBoard, boardSize, updatedClickedSquare);
+  if (updatedField.numNeighboringMines === 0) {
+    // If clicked field does not have adjacent mines, reveal neighbors
+    return revealNeighbors(newBoard, boardSize, updatedField);
   }
 
   return newBoard;
 }
 
-export function revealAllSquares(board) {
-  // Reveal all squares when game is over
+export function revealAllFields(board) {
+  // Reveal all fields when game is over
   const newBoard = cloneDeep(board);
 
   for (let row of newBoard) {
-    for (let square of row) {
-      square.isRevealed = true;
+    for (let field of row) {
+      field.isRevealed = true;
     }
   }
 

@@ -5,8 +5,8 @@ const Toolbar = () => {
   return (
     <div style={{
       display: 'flex',
-      justifyContent: 'space-between',
       alignItems: 'center',
+      justifyContent: 'space-between',
 
       width: '100%',
       margin: '0 auto',

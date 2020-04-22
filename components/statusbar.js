@@ -11,8 +11,8 @@ const Statusbar = () => {
   return (
     <div style={{
       width: '100%',
-      padding: '20px 0',
       margin: '0 auto',
+      padding: '20px 0',
     }}>
       {gameStatus === GameStatusTypes.INACTIVE &&
         <h3 style={{ textAlign: 'left' }}>

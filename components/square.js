@@ -3,91 +3,101 @@ import { useState } from 'react';
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
 import { useGameState, useGameDispatch } from '../contexts/gameContext';
-import { colorPalette } from '../utils/colorUtils';
+import { colors } from '../utils/colorUtils';
 
 import Flag from '../components/flag';
 import Mine from '../components/mine';
 
-const Square = ({ square }) => {
-  const { gameStatus, numMines, numFlags } = useGameState();
+const Square = ({ field }) => {
+  const {
+    gameStatus,
+    numMines,
+    numFlags,
+  } = useGameState();
   const dispatch = useGameDispatch();
-
   const [isHovered, setIsHovered] = useState(false);
+  const coordinates = {
+    x: field.x,
+    y: field.y,
+  };
 
-  const rules = (isDisabled, isHovered, value) => ({
+  const rules = (isDisabled, isHovered, num) => ({
     width: 40,
     height: 40,
     padding: 10,
 
+    color: colors[num],
     fontSize: 20,
-    lineHeight: 1,
     textAlign: 'center',
+    lineHeight: 1,
 
     backgroundColor: isDisabled ? '#EEE' : (isHovered ? '#A9A9A9' : '#C4C4C4'),
     borderColor: (isHovered && !isDisabled) ? '#A9A9A9 #808080 #808080 #A9A9A9' : '#F2F2F2 #808080 #808080 #F2F2F2',
     borderStyle: 'solid',
     borderWidth: '4px',
 
-    color: colorPalette[value],
     cursor: isDisabled ? 'initial' : 'pointer',
     transition: 'all 0.05s ease-in-out',
   });
 
   const onLeftClick = () => {
-    if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST || square.isFlagged || square.isRevealed) return;
+    if (gameStatus === GameStatusTypes.WON || gameStatus === GameStatusTypes.LOST || field.isFlagged || field.isRevealed) return;
 
     if (gameStatus === GameStatusTypes.INACTIVE) {
       dispatch({
-        type: GameActionTypes.INITIALIZE_BOARD,
-        payload: square,
+        type: GameActionTypes.POPULATE_BOARD,
+        payload: coordinates,
       });
-    } else if (gameStatus === GameStatusTypes.ACTIVE) {
-      dispatch({
-        type: GameActionTypes.REVEAL_SQUARE,
-        payload: square,
-      });
+      return;
     }
+
+    dispatch({
+      type: GameActionTypes.REVEAL_FIELD,
+      payload: coordinates,
+    });
   }
 
   const onRightClick = e => {
     e.preventDefault();
     e.stopPropagation();
 
-    if ((numMines - numFlags === 0) && !square.isFlagged) return;
+    if ((numMines - numFlags === 0) && !field.isFlagged) return;
 
-    if (gameStatus === GameStatusTypes.ACTIVE && !square.isRevealed) {
+    if (gameStatus === GameStatusTypes.ACTIVE && !field.isRevealed) {
       dispatch({
         type: GameActionTypes.TOGGLE_FLAG,
-        payload: square,
+        payload: coordinates,
       });
     }
   }
 
-  const renderContent = square => {
-    if (square.isFlagged) return <Flag />;
-
-    if (square.isRevealed) {
-      if (square.isMine) return <Mine />;
-      if (square.numNeighboringMines !== 0) return square.numNeighboringMines;
-    }
+  const onHover = () =>{
+    if (field.isFlagged || (field.isMine && field.isRevealed)) return;
+    setIsHovered(true);
   }
 
-  const isDisabled = square => {
-    if (square.isMine || square.isFlagged) return false;
-    return square.isRevealed;
+  const isDisabled = field => {
+    if (field.isMine || field.isFlagged) return false;
+    return field.isRevealed;
+  }
+
+  const renderContent = field => {
+    if (field.isFlagged) return <Flag />;
+
+    if (field.isRevealed) {
+      if (field.isMine) return <Mine />;
+      if (field.numNeighboringMines !== 0) return field.numNeighboringMines;
+    }
   }
 
   return (
     <div
-      style={rules(isDisabled(square), isHovered, square.numNeighboringMines)}
+      style={rules(isDisabled(field), isHovered, field.numNeighboringMines)}
       onClick={onLeftClick}
       onContextMenu={onRightClick}
-      onMouseEnter={() => {
-        if (square.isFlagged || (square.isMine && square.isRevealed)) return;
-        setIsHovered(true);
-      }}
+      onMouseEnter={onHover}
       onMouseLeave={() => setIsHovered(false)}>
-      {renderContent(square)}
+      {renderContent(field)}
     </div>
   );
 }
