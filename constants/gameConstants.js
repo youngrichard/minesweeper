@@ -28,3 +28,10 @@ export const INITIAL_STATE = {
   numFlags: 0,
   gameStatus: GameStatusTypes.INACTIVE,
 };
+
+export const DEFAULT_FIELD_PROPS = {
+  isMine: false,
+  isFlagged: false,
+  isRevealed: false,
+  numNeighboringMines: 0,
+};
