@@ -8,8 +8,8 @@ import {
 import GameActionTypes from '../actions/gameActions';
 import { GameStatusTypes } from '../constants/gameConstants';
 
-import RestartButton from '../components/restartButton';
-import BoardSizer from '../components/boardSizer';
+import Toolbar from '../components/toolbar';
+import Statusbar from '../components/statusbar';
 import Layout from '../components/layout';
 import Square from '../components/square';
 import Desk from '../components/desk';
@@ -30,14 +30,17 @@ const App = () => {
 
   return (
     <Layout>
-      <BoardSizer />
-      <RestartButton />
       <Desk boardSize={boardSize}>
+        <Toolbar />
         {board.map((row, x) =>
           row.map((square, y) =>
-            <Square key={x + ',' + y} square={square} />
+            <Square
+              key={x + ',' + y}
+              square={square}
+            />
           )
         )}
+        <Statusbar />
       </Desk>
     </Layout>
   );

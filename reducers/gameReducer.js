@@ -4,6 +4,7 @@ import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
 
 import {
   checkActiveGameStatus,
+  countFlags,
   createBoard,
   initializeBoard,
   revealAllSquares,
@@ -18,6 +19,7 @@ const gameReducer = (state, action) => {
 
       return {
         ...state,
+        board: createBoard(boardSize),
         boardSize,
         numMines: BOARD_SIZE_NUM_MINES_MAP[boardSize],
         gameStatus: GameStatusTypes.INACTIVE,
@@ -42,9 +44,13 @@ const gameReducer = (state, action) => {
         numMines,
       } = state;
 
+      const initBoard = initializeBoard(board, boardSize, numMines, clickedSquare);
+      const newBoard = revealSquare(initBoard, boardSize, clickedSquare);
+
       return {
         ...state,
-        board: initializeBoard(board, boardSize, numMines, clickedSquare),
+        board: newBoard,
+        numFlags: 0,
         gameStatus: GameStatusTypes.ACTIVE,
       };
     }
@@ -53,10 +59,14 @@ const gameReducer = (state, action) => {
       const { board } = state;
       const clickedSquare = action.payload;
 
+      const newBoard = toggleFlag(board, clickedSquare);
+      const numFlags = countFlags(newBoard);
+
       return {
         ...state,
-        board: toggleFlag(board, clickedSquare),
-      }
+        board: newBoard,
+        numFlags,
+      };
     }
 
     case GameActionTypes.REVEAL_SQUARE: {
@@ -64,8 +74,6 @@ const gameReducer = (state, action) => {
       const clickedSquare = action.payload;
 
       const newBoard = revealSquare(board, boardSize, clickedSquare);
-
-      // Update game status based upon new board
       const gameStatus = checkActiveGameStatus(newBoard, boardSize)
 
       return {
@@ -81,7 +89,7 @@ const gameReducer = (state, action) => {
       return {
         ...state,
         board: revealAllSquares(board),
-      }
+      };
     }
 
     default: {

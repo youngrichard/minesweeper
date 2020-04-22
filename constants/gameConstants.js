@@ -25,5 +25,6 @@ export const INITIAL_STATE = {
   board: createBoard(DEFAULT_BOARD_SIZE),
   boardSize: DEFAULT_BOARD_SIZE,
   numMines: BOARD_SIZE_NUM_MINES_MAP[DEFAULT_BOARD_SIZE],
+  numFlags: 0,
   gameStatus: GameStatusTypes.INACTIVE,
 };

@@ -9,12 +9,12 @@ import Flag from '../components/flag';
 import Mine from '../components/mine';
 
 const Square = ({ square }) => {
-  const { gameStatus } = useGameState();
+  const { gameStatus, numMines, numFlags } = useGameState();
   const dispatch = useGameDispatch();
 
-  const [isHover, setIsHover] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
-  const rules = (disabled, isHover, value) => ({
+  const rules = (isDisabled, isHovered, value) => ({
     width: 40,
     height: 40,
     padding: 10,
@@ -23,13 +23,14 @@ const Square = ({ square }) => {
     lineHeight: 1,
     textAlign: 'center',
 
-    backgroundColor: disabled ? '#EEE' : (isHover ? '#A9A9A9' : '#C4C4C4'),
-    borderColor: (isHover && !disabled) ? '#A9A9A9 #808080 #808080 #A9A9A9' : '#F2F2F2 #808080 #808080 #F2F2F2',
+    backgroundColor: isDisabled ? '#EEE' : (isHovered ? '#A9A9A9' : '#C4C4C4'),
+    borderColor: (isHovered && !isDisabled) ? '#A9A9A9 #808080 #808080 #A9A9A9' : '#F2F2F2 #808080 #808080 #F2F2F2',
     borderStyle: 'solid',
     borderWidth: '4px',
 
     color: colorPalette[value],
-    cursor: disabled ? 'initial' : 'pointer',
+    cursor: isDisabled ? 'initial' : 'pointer',
+    transition: 'all 0.05s ease-in-out',
   });
 
   const onLeftClick = () => {
@@ -40,17 +41,19 @@ const Square = ({ square }) => {
         type: GameActionTypes.INITIALIZE_BOARD,
         payload: square,
       });
+    } else if (gameStatus === GameStatusTypes.ACTIVE) {
+      dispatch({
+        type: GameActionTypes.REVEAL_SQUARE,
+        payload: square,
+      });
     }
-
-    dispatch({
-      type: GameActionTypes.REVEAL_SQUARE,
-      payload: square,
-    });
   }
 
   const onRightClick = e => {
     e.preventDefault();
     e.stopPropagation();
+
+    if ((numMines - numFlags === 0) && !square.isFlagged) return;
 
     if (gameStatus === GameStatusTypes.ACTIVE && !square.isRevealed) {
       dispatch({
@@ -76,14 +79,14 @@ const Square = ({ square }) => {
 
   return (
     <div
-      style={rules(isDisabled(square), isHover, square.numNeighboringMines)}
+      style={rules(isDisabled(square), isHovered, square.numNeighboringMines)}
       onClick={onLeftClick}
       onContextMenu={onRightClick}
       onMouseEnter={() => {
         if (square.isFlagged || (square.isMine && square.isRevealed)) return;
-        setIsHover(true);
+        setIsHovered(true);
       }}
-      onMouseLeave={() => setIsHover(false)}>
+      onMouseLeave={() => setIsHovered(false)}>
       {renderContent(square)}
     </div>
   );

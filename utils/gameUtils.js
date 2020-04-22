@@ -1,4 +1,4 @@
-import { cloneDeep, flatten } from 'lodash';
+import { cloneDeep, flattenDeep } from 'lodash';
 
 import { getRandomInt } from './numberUtils';
 import { GameStatusTypes } from '../constants/gameConstants';
@@ -38,7 +38,8 @@ export function createBoard(boardSize) {
 
 export function initializeBoard(board, boardSize, numMines, clickedSquare) {
   // Populates mines and counts on the board
-  const mineField = plantMines(board, boardSize, numMines, clickedSquare);
+  const newBoard = cloneDeep(board);
+  const mineField = plantMines(newBoard, boardSize, numMines, clickedSquare);
   return countNeighboringMines(mineField, boardSize);
 };
 
@@ -53,7 +54,7 @@ function plantMines(board, boardSize, numMines, clickedSquare) {
 
     if (!square.isMine) {
       square.isMine = true;
-      numMines--;
+      numMines -= 1;
     }
   }
 
@@ -67,8 +68,10 @@ function countNeighboringMines(board, boardSize) {
   for (let row of newBoard) {
     for (let square of row) {
       if (square.isMine) {
-        const neighboringSquares = getNeighboringSquares(newBoard, boardSize, square);
-        neighboringSquares.forEach(neighboringSquare => neighboringSquare.numNeighboringMines++);
+        const neighbors = getNeighboringSquares(newBoard, boardSize, square);
+        neighbors.forEach(n => {
+          n.numNeighboringMines += 1;
+        });
       }
     }
   }
@@ -139,17 +142,15 @@ export function revealNeighbors(board, boardSize, originSquare) {
 }
 
 export function checkActiveGameStatus(board, boardSize) {
-  const flatBoard = flatten(board);
+  const flatBoard = flattenDeep(cloneDeep(board));
 
   // If a mine is revealed, the game is lost
   for (let square of flatBoard) {
-    if (square.isMine && square.isRevealed) {
-      return GameStatusTypes.LOST;
-    }
+    if (square.isMine && square.isRevealed) return GameStatusTypes.LOST;
   }
 
   const expected = boardSize ** 2 - BOARD_SIZE_NUM_MINES_MAP[boardSize];
-  const actual = flatBoard.reduce((total, current) => current.isRevealed && total++, 0);
+  const actual = flatBoard.reduce((total, current) => current.isRevealed ? total + 1 : total, 0);
 
   // If number of revealed = number of squares - number of mines, the game is won
   if (actual === expected) return GameStatusTypes.WON;
@@ -168,14 +169,15 @@ export function toggleFlag(board, clickedSquare) {
 }
 
 export function revealSquare(board, boardSize, clickedSquare) {
+  const newBoard = cloneDeep(board);
+
   // Reveal clicked square
-  let newBoard = cloneDeep(board);
-
   newBoard[clickedSquare.x][clickedSquare.y].isRevealed = true;
+  const updatedClickedSquare = newBoard[clickedSquare.x][clickedSquare.y];
 
-  if (clickedSquare.numNeighboringMines === 0) {
+  if (updatedClickedSquare.numNeighboringMines === 0) {
     // If clicked square does not have adjacent mines, reveal neighbors
-    newBoard = revealNeighbors(newBoard, boardSize, clickedSquare);
+    return revealNeighbors(newBoard, boardSize, updatedClickedSquare);
   }
 
   return newBoard;
@@ -192,4 +194,10 @@ export function revealAllSquares(board) {
   }
 
   return newBoard;
+}
+
+export function countFlags(board) {
+  // Counts number of flags placed
+  const flatBoard = flattenDeep(cloneDeep(board));
+  return flatBoard.reduce((total, current) => current.isFlagged ? total + 1 : total, 0);
 }
