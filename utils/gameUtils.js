@@ -2,7 +2,7 @@ import { cloneDeep, flattenDeep } from 'lodash';
 
 import { getRandomInt } from './numberUtils';
 import { GameStatusTypes } from '../constants/gameConstants';
-import { BOARD_SIZE_NUM_MINES_MAP, DEFAULT_FIELD_PROPS } from '../constants/gameConstants';
+import { BOARD_SIZE_NUM_MINES_MAP } from '../constants/gameConstants';
 
 /**
  * Helper functions to manipulate the game board
@@ -12,6 +12,12 @@ export function createBlankBoard(boardSize) {
   // Creates an blank board of a given size
   // x and y coordinates are added to each field
   const board = [];
+  const DEFAULT_FIELD_PROPS = {
+    isMine: false,
+    isFlagged: false,
+    isRevealed: false,
+    numNeighboringMines: 0,
+  };
 
   for (let x = 0; x < boardSize; x++) {
     const row = [];
@@ -157,7 +163,8 @@ export function toggleFlag(board, coordinates) {
   const newBoard = cloneDeep(board);
 
   // Toggle flag for clicked field
-  newBoard[coordinates.x][coordinates.y].isFlagged = !field.isFlagged;
+  const field = newBoard[coordinates.x][coordinates.y];
+  field.isFlagged = !field.isFlagged;
 
   return newBoard;
 }

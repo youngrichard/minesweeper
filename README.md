@@ -5,7 +5,7 @@
 It assumes you have the latest node and yarn installed.
 
 ```
-yarn install
+yarn install --ignore-engines
 yarn dev
 open http://localhost:3000
 ```
